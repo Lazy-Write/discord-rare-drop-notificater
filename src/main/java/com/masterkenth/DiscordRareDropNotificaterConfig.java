@@ -100,11 +100,20 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "AlwaysSendAboveRarity",
+			name = "Always send above drop rate (1/x)",
+			description = "Drops more rare than this are posted to Discord, regardless of the ignore list or min NPC value",
+			section = itemFiltersSection,
+			position = 3
+	)
+	default int AlwaysSendAboveRarity()	{ return 1000; }
+
+	@ConfigItem(
 		keyName = "andinsteadofor",
 		name = "Require both rarity and value",
 		description = "Whether drops should meet both rarity AND value requirements to get posted",
 		section = itemFiltersSection,
-		position = 3
+		position = 4
 	)
 	default boolean andInsteadOfOr()
 	{
@@ -116,7 +125,7 @@ public interface DiscordRareDropNotificaterConfig extends Config
 		name = "Always send uniques (events)",
 		description = "Whether unique drops from events should always get posted (COX, TOB, ...)",
 		section = itemFiltersSection,
-		position = 4
+		position = 5
 	)
 	default boolean sendUniques()
 	{
@@ -188,4 +197,5 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	{
 		return true;
 	}
+
 }

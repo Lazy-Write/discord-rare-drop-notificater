@@ -73,7 +73,7 @@ import org.json.JSONObject;
 @PluginDescriptor(
 	name = "Discord Rare Drop Notificater",
 	description = "Sends a detailed notification via Discord webhooks whenever you get a rare/unique drop.",
-	tags = {"discord", "loot", "unique", "boss", "notification"}
+	tags = {"discord", "loot", "unique", "boss", "notification", "webhook", "rare", "drop"}
 )
 public class DiscordRareDropNotificaterPlugin extends Plugin
 {
@@ -348,6 +348,26 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 			log.debug("We're not in any item list. We need to continue our check.");
 		}
 
+		//AlwaysSendAboveRarity logic
+		int forceRarity = config.AlwaysSendAboveRarity();
+
+		if (forceRarity > 0)
+		{
+			return itemDataSupplier.get().thenApply(itemData ->
+			{
+				if (itemData != null && itemData.Rarity <= (1f / forceRarity))
+				{
+					if (log.isDebugEnabled())
+					{
+						log.debug("Force-broadcasting {} due to rarity override (1/{})",
+								itemManager.getItemComposition(itemId).getName(),
+								forceRarity);
+					}
+					return true;
+				}
+				return meetsRequirements(itemData, quantity);
+			});
+		}
 
 		return itemDataSupplier.get().thenCompose(itemData -> {
 			result.complete(meetsRequirements(itemData, quantity));
@@ -698,18 +718,17 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 
 	private String getPlayerIconUrl()
 	{
-		switch (client.getVarbitValue(Varbits.ACCOUNT_TYPE))
+		switch (client.getAccountType())
 		{
-			case 1:
+			case IRONMAN:
 				return "https://oldschool.runescape.wiki/images/0/09/Ironman_chat_badge.png";
-			case 3:
+			case HARDCORE_IRONMAN:
 				return "https://oldschool.runescape.wiki/images/b/b8/Hardcore_ironman_chat_badge.png";
-			case 2:
+			case ULTIMATE_IRONMAN:
 				return "https://oldschool.runescape.wiki/images/0/02/Ultimate_ironman_chat_badge.png";
-			case 4:
-			case 6:
+			case GROUP_IRONMAN:
 				return "https://oldschool.runescape.wiki/images/Group_ironman_chat_badge.png";
-			case 5:
+			case HARDCORE_GROUP_IRONMAN:
 				return "https://oldschool.runescape.wiki/images/Hardcore_group_ironman_chat_badge.png";
 			default:
 				return null;
