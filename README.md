@@ -84,6 +84,8 @@ Set these values to 0 to disable these features.
 
 **Original author:** @MasterKenth
 
-**Current repository owner:** @BossHuso
+**Forked from current repository owner:** @BossHuso
+
+**Updated with added filters and pull requests:** Lazy Write
 
 **and other contributors!**
