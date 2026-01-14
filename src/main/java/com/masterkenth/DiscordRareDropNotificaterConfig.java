@@ -59,7 +59,7 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	@ConfigSection(
 			position = 4,
 			name = "Always Send Filters",
-			description = "Manage filters that handle if drops should be posted regardless of other settings."
+			description = "Manage filters that handle if drops should be posted regardless of other settings (supports shorthand: 1m, 500k, or full numbers)."
 	)
 	String alwaysSendSection = "alwaysSendSection";
 	@ConfigSection(
@@ -90,7 +90,7 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	)
 	default int minRarity()
 	{
-		return 64;
+		return 128;
 	}
 
 	@ConfigItem(
@@ -102,7 +102,7 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	)
 	default int minValue()
 	{
-		return 50000;
+		return 250000;
 	}
 
 	@ConfigItem(
@@ -196,12 +196,21 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "AlwaysSendAboveRarity",
-			name = "Above drop rate (1/x)",
+			keyName = "AlwaysSendRarity",
+			name = "Min forced rarity (1/x)",
 			description = "Drops rarer than this are always posted to Discord, regardless of the ignore list or min NPC rarity/value",
 			section = alwaysSendSection,
 			position = 1
 	)
-	default int AlwaysSendAboveRarity()	{ return 1000; }
+	default int AlwaysSendRarity()	{ return 1000; }
+
+	@ConfigItem(
+			keyName = "AlwaysSendValue",
+			name = "Min forced value",
+			description = "NPC drops more valuable (GE or HA) than this are always posted to Discord, regardless of the ignore list or min NPC rarity/value",
+			section = alwaysSendSection,
+			position = 2
+	)
+	default int AlwaysSendValue()	{ return 1000000; }
 
 }

@@ -280,11 +280,11 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 		String lowerName = comp.getName().toLowerCase();
 
 		List<String> whitelist = Arrays.stream(config.whiteListedItems()
-			.split(",")).filter(itemName -> itemName.length() > 0)
+			.split(",")).map(String::trim).filter(itemName -> itemName.length() > 0)
 			.map(String::toLowerCase).collect(Collectors.toList());
 
 		List<String> blacklist = Arrays.stream(config.ignoredKeywords()
-			.split(",")).filter(itemName -> itemName.length() > 0)
+			.split(",")).map(String::trim).filter(itemName -> itemName.length() > 0)
 			.map(String::toLowerCase).collect(Collectors.toList());
 
 		if(log.isDebugEnabled())
@@ -305,19 +305,6 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 			return result;
 		}
 
-		if(blacklist.stream().anyMatch(lowerName::equals)){
-			// Exact match with blacklist
-			// must be ignored
-
-			if(log.isDebugEnabled())
-			{
-				log.debug("We're blacklisted. We cannot be sent");
-			}
-
-			result.complete(false);
-			return result;
-		}
-
 		if(whitelist.stream().anyMatch(lowerName::contains)){
 			// Fuzzy whitelist
 			// is accepted
@@ -328,6 +315,62 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 			}
 
 			result.complete(true);
+			return result;
+		}
+
+		// Always send rarity and value
+		int forceRarity = config.AlwaysSendRarity();
+		int forceValue = config.AlwaysSendValue();
+
+		if (forceRarity > 0 || forceValue > 0)
+		{
+			if(log.isDebugEnabled())
+			{
+				log.debug("We're above force-send values. We must be sent.");
+			}
+			return itemDataSupplier.get().thenApply(itemData ->
+			{
+				if (itemData == null)
+				{
+					return false;
+				}
+
+				int totalGeValue = itemData.GePrice * quantity;
+				int totalHaValue = itemData.HaPrice * quantity;
+
+				boolean rarityOverride =
+						forceRarity > 0 && itemData.Rarity <= (1f / forceRarity);
+
+				boolean valueOverride =
+						forceValue > 0 && (totalGeValue >= forceValue || totalHaValue >= forceValue);
+
+				if (rarityOverride || valueOverride)
+				{
+					if (log.isDebugEnabled())
+					{
+						log.debug(
+								"Force-broadcasting {} due to {} override",
+								itemManager.getItemComposition(itemId).getName(),
+								rarityOverride ? "rarity" : "value"
+						);
+					}
+					return true;
+				}
+
+				return meetsRequirements(itemData, quantity);
+			});
+		}
+
+		if(blacklist.stream().anyMatch(lowerName::equals)){
+			// Exact match with blacklist
+			// must be ignored
+
+			if(log.isDebugEnabled())
+			{
+				log.debug("We're blacklisted. We cannot be sent");
+			}
+
+			result.complete(false);
 			return result;
 		}
 
@@ -348,34 +391,14 @@ public class DiscordRareDropNotificaterPlugin extends Plugin
 			log.debug("We're not in any item list. We need to continue our check.");
 		}
 
-		//AlwaysSendAboveRarity logic
-		int forceRarity = config.AlwaysSendAboveRarity();
-
-		if (forceRarity > 0)
-		{
-			return itemDataSupplier.get().thenApply(itemData ->
-			{
-				if (itemData != null && itemData.Rarity <= (1f / forceRarity))
-				{
-					if (log.isDebugEnabled())
-					{
-						log.debug("Force-broadcasting {} due to rarity override (1/{})",
-								itemManager.getItemComposition(itemId).getName(),
-								forceRarity);
-					}
-					return true;
-				}
-				return meetsRequirements(itemData, quantity);
-			});
-		}
-
+		// Normal send requirements
 		return itemDataSupplier.get().thenCompose(itemData -> {
 			result.complete(meetsRequirements(itemData, quantity));
 			return result;
 		});
 	}
 
-	private CompletableFuture<Boolean> processEventNotification(LootRecordType lootRecordType, String eventName, int itemId, int quantity)
+		private CompletableFuture<Boolean> processEventNotification(LootRecordType lootRecordType, String eventName, int itemId, int quantity)
 	{
 		ItemData itemData = lootRecordType == LootRecordType.PICKPOCKET ? rarityChecker.CheckRarityPickpocket(eventName, EnrichItem(itemId), itemManager) : rarityChecker.CheckRarityEvent(eventName, EnrichItem(itemId), itemManager);
 
