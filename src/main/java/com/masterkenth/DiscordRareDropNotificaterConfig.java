@@ -52,12 +52,18 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	@ConfigSection(
 			position = 3,
 			name = "Item Filters",
-			description = "Manage filters that handle if drop should be posted or not"
+			description = "Manage filters that handle if drops should be posted or not"
 	)
 	String itemFiltersSection = "itemFiltersSection";
 
 	@ConfigSection(
 			position = 4,
+			name = "Always Send Filters",
+			description = "Manage filters that handle if drops should be posted regardless of other settings."
+	)
+	String alwaysSendSection = "alwaysSendSection";
+	@ConfigSection(
+			position = 5,
 			name = "Player Filters",
 			description = "Manage filters to prevent drops being posted from all your accounts"
 	)
@@ -98,15 +104,6 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	{
 		return 50000;
 	}
-
-	@ConfigItem(
-			keyName = "AlwaysSendAboveRarity",
-			name = "Always send above drop rate (1/x)",
-			description = "Drops more rare than this are posted to Discord, regardless of the ignore list or min NPC value",
-			section = itemFiltersSection,
-			position = 3
-	)
-	default int AlwaysSendAboveRarity()	{ return 1000; }
 
 	@ConfigItem(
 		keyName = "andinsteadofor",
@@ -197,5 +194,14 @@ public interface DiscordRareDropNotificaterConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+			keyName = "AlwaysSendAboveRarity",
+			name = "Above drop rate (1/x)",
+			description = "Drops rarer than this are always posted to Discord, regardless of the ignore list or min NPC rarity/value",
+			section = alwaysSendSection,
+			position = 1
+	)
+	default int AlwaysSendAboveRarity()	{ return 1000; }
 
 }

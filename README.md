@@ -60,6 +60,19 @@ Value is calculated as the largest value between Grand Exchange and High Alchemy
 
 **Always send uniques:** When enabled and the item is not blacklisted, the webhooks will be notified of any uniques. _note_ our system must be able to identify the drop as an unique. 
 
+### Always Send Filters
+
+These settings force drops to be sent regardless of other filters.
+
+**Above Drop Rate (1/x):** Any NPC drop at or rarer than this drop rate will always be sent to Discord, even if the item
+is ignored or below the minimum NPC rarity/value.
+
+This is intended for setups that enable '**require both rarity and value**', while still allowing extremely rare low-value drops to 
+be broadcast. It prevents Discord spam from common drops, but ensures rare “meme” drops—such as the 1/6,400 uncut diamond
+from Sarachnis—are still shared.
+
+Set the rarity to 0 to disable this feature.
+
 ## Thanks to
 
 **Original author:** @MasterKenth
