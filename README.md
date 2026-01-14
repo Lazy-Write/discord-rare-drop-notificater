@@ -64,14 +64,21 @@ Value is calculated as the largest value between Grand Exchange and High Alchemy
 
 These settings force drops to be sent regardless of other filters.
 
-**Above Drop Rate (1/x):** Any NPC drop at or rarer than this drop rate will always be sent to Discord, even if the item
+**Min Forced Rarity (1/x):** Any NPC drop at or rarer than this drop rate will always be sent to Discord, even if the item
 is ignored or below the minimum NPC rarity/value.
 
-This is intended for setups that enable '**require both rarity and value**', while still allowing extremely rare low-value drops to 
-be broadcast. It prevents Discord spam from common drops, but ensures rare “meme” drops—such as the 1/6,400 uncut diamond
-from Sarachnis—are still shared.
+This is intended for setups that enable '**require both rarity and value**', while still allowing rare drops with a low-value 
+to be broadcast. It prevents Discord spam from common drops, but ensures rare “meme” drops—such as the **1/6,400** 
+uncut diamond from Sarachnis—are still shared if the values are configured to do so.
 
-Set the rarity to 0 to disable this feature.
+**Min Forced Value:** Any NPC drop worth the same or higher than this value will always be sent to Discord, even if the
+item is ignored or below the minimum NPC rarity/value.
+
+This is intended for setups that enable '**require both rarity and value**', while still allowing high value drops with 
+a low-rarity to be broadcast. It prevents Discord spam from usual low-value drops, but ensures common drops of a high value 
+—such as the **1/17** Oathplate shards from Yama—are still shared if the values are configured to do so.
+
+Set these values to 0 to disable these features.
 
 ## Thanks to
 
